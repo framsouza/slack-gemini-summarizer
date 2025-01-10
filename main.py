@@ -40,7 +40,6 @@ def get_all_channels() -> List[dict]:
             channels = response["channels"]
             all_channels.extend(channels)
 
-            # Check if there's a next page
             next_cursor = response["response_metadata"].get("next_cursor", None)
             if not next_cursor:
                 break
@@ -86,7 +85,6 @@ def send_to_gemini(conversation: str, prompt: str):
     except requests.RequestException as e:
         print(f"Error sending data to Gemini API: {e}")
 
-# Main execution
 if __name__ == "__main__":
     if not slack_token:
         print("Error: SLACK_API environment variable not set.")
@@ -103,9 +101,16 @@ if __name__ == "__main__":
                     "Enter your question about the channel (or press Enter for default summary): "
                 ).strip()
 
+                # Detailed prompt for summaries
                 prompt = user_question if user_question else (
-                    "Create a detailed summary of what was discussed in this channel, including incident timelines, "
-                    "mitigation steps, resolution details, and identified action items."
+                    "Create a comprehensive and structured detailed summary of the discussions in this channel. "
+                    "The summary should include:\n"
+                    "1. **Incident Detection**: What happened.\n"
+                    "2. **Mitigation Steps**: List the steps taken to address the incident, with as much detail as possible.\n"
+                    "3. **Resolution Details**: Explain how the issue was resolved and confirm if any follow-ups are required.\n"
+                    "4. **Action Items**: Identify the next steps, assigned responsibilities, and deadlines.\n"
+                    "5. **Highlights**: Summarize any additional important discussions or decisions made during the conversation.\n"
+                    "Ensure the summary is concise, accurate, and easy to understand."
                 )
 
                 print("Sending data to Gemini for analysis...")
